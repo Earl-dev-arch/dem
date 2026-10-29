@@ -5,8 +5,27 @@ const splitLetters = (element) => {
   while (walker.nextNode()) textNodes.push(walker.currentNode);
 
   textNodes.forEach((node) => {
+    const raw = node.textContent;
+    if (!raw.trim()) {
+      node.parentNode.removeChild(node);
+      return;
+    }
+
+    let text = raw.replace(/\s+/g, ' ');
+    if (!node.previousSibling || node.previousSibling.nodeName === 'BR') {
+      text = text.trimStart();
+    }
+    if (!node.nextSibling || node.nextSibling.nodeName === 'BR') {
+      text = text.trimEnd();
+    }
+
+    if (!text) {
+      node.parentNode.removeChild(node);
+      return;
+    }
+
     const fragment = document.createDocumentFragment();
-    [...node.textContent].forEach((character, index) => {
+    [...text].forEach((character, index) => {
       const letter = document.createElement('span');
       letter.className = 'scroll-letter';
       letter.style.setProperty('--letter-delay', `${index * 18}ms`);
